@@ -4,7 +4,7 @@
 /* A0-teclado  A2-ldr1  A3-ldr2 */
 
 output int PIN_02; //led azul
-output int PIN_03; //led lilás
+output int PIN_03; //led vermelho
 
 output int PIN_04; //led verde
 output int PIN_05; //led laranja
@@ -164,6 +164,7 @@ loop do
 	end
 
 	await 10s;
+	velocidadeLimite = 0;
 	emit PIN_04(LOW);
 	emit PIN_05(LOW);
 	emit PIN_06(LOW);

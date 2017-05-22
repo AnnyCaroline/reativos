@@ -29,13 +29,154 @@ native _noTone;
 
 native/plain _tempoLdr1;
 native/pre do
-	unsigned long int _tempoLdr1;
+	unsigned long int tempoLdr1;
 end
 
 native/plain _tempoLdr2;
 native/pre do
-	unsigned long int _tempoLdr2;
+	unsigned long int tempoLdr2;
 end
+
+native _musicaVelocidadeOk;
+native _musicaVelocidadeMaior;
+native _musicaEnviar;
+native _musicaApagar;
+native _musicaTamanho;
+native _musicaInserirNumero;
+native _bip;
+
+native/pre do
+	void musicaVelocidadeOk(){
+		//musica mario
+		tone(10,2637);
+        delay(83);
+       	noTone(10);
+		delay(108);
+		tone(10,2637);
+		delay(83);
+		noTone(10);
+		delay(299);
+		tone(10,2637);
+		delay(83);
+		
+		noTone(10);
+		delay(299);
+		tone(10,2093);
+		delay(83);
+		noTone(10);
+		delay(108);
+		tone(10,2637);
+		delay(83);
+		noTone(10);
+		delay(299);
+		
+		tone(10,3136);
+		delay(83);
+		noTone(10);
+		delay(681);
+		tone(10,1568);
+		delay(100);
+		noTone(10);
+		delay(500);
+	}
+
+	void musicaVelocidadeMaior(){
+		//musica mario perdendo a vida
+		tone(10,1976);
+		delay(80);
+		noTone(10);
+		delay(80);
+
+		tone(10,2794);
+		delay(80);
+		noTone(10);
+		delay(120);
+		//
+		tone(10,2794);
+		delay(80);
+		noTone(10);
+		delay(80);
+
+		tone(10,2794);
+		delay(80);
+		noTone(10);
+		delay(80);
+
+		tone(10,2637);
+		delay(80);
+		noTone(10);
+		delay(120);
+		//
+		tone(10,2349);
+		delay(80);
+		noTone(10);
+		delay(80);
+
+		tone(10,2093);
+		delay(80);
+		noTone(10);
+		delay(80);
+
+		tone(10,1568);
+		delay(80);
+		noTone(10);
+		delay(120);
+		//
+		tone(10,1319);
+		delay(80);
+		noTone(10);
+		delay(80);
+
+		tone(10,1047);
+		delay(80);
+		noTone(10);
+		delay(500);
+	}
+
+	void musicaEnviar(){
+		tone(10,262);
+		delay(70);
+		tone(10,330);
+		delay(70);
+		tone(10,391);
+		delay(200);
+		noTone(10);		
+	}
+
+	void musicaApagar(){
+		tone(10,260);
+		delay(50);
+		noTone(10);
+		delay(50);
+		tone(10,260);
+		delay(70);
+		noTone(10);
+	}
+
+	void musicaTamanho(){
+		tone(10,247);							
+		delay(70);
+		tone(10,233);							
+		delay(70);
+		tone(10,220);							
+		delay(70);
+		noTone(10);
+	}
+
+	void musicaInserirNumero(){
+		tone(10,440);
+		delay(70);
+		noTone(10);
+	}
+
+	void bip(){
+		tone(10,440);
+		delay(200);
+		noTone(10);
+		delay(800);
+	}
+end
+
 
 _Serial.begin(9600);
 
@@ -59,50 +200,27 @@ loop do
 						aguardandoLeitura=false;
 
 						if (tecla[i]==12) then //12=# enviar
-							_tone(A1,262);
-							await 70ms;
-							_tone(A1,330);
-							await 70ms;
-							_tone(A1,391);
-							await 200ms;
-							_noTone(A1);
+							_musicaEnviar();
 							break/j;
-						end
 
-						if (tecla[i]==11) then //11=* apagar
+						else/if (tecla[i]==11) then //11=* apagar
 							velocidadeLimite=0;
-							_tone(A1,260);
-							await 50ms;
-							_noTone(A1);
-							await 50ms;
-							_tone(A1,260);
-							await 70ms;
-							_noTone(A1);
-						else
+							_musicaApagar();
 
-						if (velocidadeLimite * 10 + tecla[i] < 0) then //estouro
-							_tone(A1,247);							
-							await 70ms;
-							_tone(A1,233);							
-							await 70ms;
-							_tone(A1,220);							
-							await 70ms;
-							_noTone(A1);
+						else/if (velocidadeLimite * 10 + tecla[i] < 0) then //estouro
+							_musicaTamanho();
+
 						else
 							velocidadeLimite = velocidadeLimite * 10 + tecla[i];
-							_tone(A1,440);
-							await 70ms;
-							_noTone(A1);
+							_musicaInserirNumero();
+							_Serial.println(velocidadeLimite);
+							break/i;	
 						end
 							
 					end
 
-					_Serial.println(velocidadeLimite);
-					break/i;
-					
 				end
 			end
-		end
 		else
 			aguardandoLeitura=true;
 		end
@@ -116,7 +234,7 @@ loop do
 		valueLdr1 = _analogRead(A2);
 		_Serial.println(valueLdr1);
 		if (valueLdr1 < 100)then
-			{_tempoLdr1 = millis();};
+			_tempoLdr1 = {millis()};
 			break;
 		end
 	end
@@ -125,14 +243,14 @@ loop do
 		valueLdr2 = _analogRead(A3);
 		_Serial.println(valueLdr2);
 		if (valueLdr2 < 100)then
-			{_tempoLdr2 = millis();};
+			_tempoLdr2 = {millis()};
 			break;
 		end
 	end
 
 	emit PIN_03(LOW);
 
-	velocidade = { DIST  * 1000.0 /  (float)(_tempoLdr2 - _tempoLdr1)  };
+	velocidade = { DIST  * 1000.0 /  (float)(tempoLdr2 - tempoLdr1)  };
 
 	{
 		Serial.print("Velocidade medida: ");
@@ -144,26 +262,43 @@ loop do
 		Serial.print("Ldr2: ");
 		Serial.println(@valueLdr2);
 		Serial.print("Millis do Ldr1: ");
-		Serial.println(_tempoLdr1);
+		Serial.println(tempoLdr1);
 		Serial.print("Millis do Ldr2: ");
-		Serial.println(_tempoLdr2);
+		Serial.println(tempoLdr2);
 	};
 
 	if (velocidade <= velocidadeLimite) then
 		_Serial.println("velocidade < limite");
 		emit PIN_04(HIGH); //led verde
+		_musicaVelocidadeOk();
+
 	else/if (velocidade <= 1.20*velocidadeLimite) then
 		_Serial.println("Até 20% do limite permitido é de R$ 130,16 - 4 pontos - média");
-		emit PIN_05(HIGH); //led amarelo	
+		emit PIN_05(HIGH); //led amarelo
+		_musicaVelocidadeMaior();
+
 	else/if (velocidade <= 1.50*velocidadeLimite) then
 		_Serial.println("De 20% até 50% do limite permitido é de R$ 195,23 - 5 pontos - grave");
 		emit PIN_06(HIGH); //led laranja		
+		_musicaVelocidadeMaior();
+
 	else
 		_Serial.println("Acima de 50% do limite permitido é de R$ 880,41 - 7 pontos - gravíssima");
 		emit PIN_07(HIGH); //led vermelho	
+		_musicaVelocidadeMaior();
+
 	end
 
-	await 10s;
+	//reinicia
+	par/or do
+		every 1s do
+			_bip();
+		end
+	with
+		await 3s;
+	end
+
+	velocidadeLimite = 0;
 	emit PIN_04(LOW);
 	emit PIN_05(LOW);
 	emit PIN_06(LOW);
@@ -171,5 +306,3 @@ loop do
 end
 
 await FOREVER;
-
-

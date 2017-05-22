@@ -49,8 +49,8 @@ native/pre do
 	void musicaVelocidadeOk(){
 		//musica mario
 		tone(10,2637);
-        delay(83);
-       	noTone(10);
+		delay(83);
+		noTone(10);
 		delay(108);
 		tone(10,2637);
 		delay(83);

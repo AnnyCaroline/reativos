@@ -1,4 +1,4 @@
-#Compilação
+# Compilação
 
 gcc sdl.cpp -lSDL2 -std=c++11 
 

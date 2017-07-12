@@ -160,10 +160,6 @@ watching sdl do
 	pool[] Seta setas;
 	spawn Seta(2, 1000, &seta2) in setas;
 	spawn Seta(1, 500, &seta1) in setas;
-	spawn Seta(3, 5000, &seta3) in setas;
-	spawn Seta(4, 1000, &seta4) in setas;
-	spawn Seta(4, 500, &seta4) in setas;
-	spawn Seta(1, 1000, &seta1) in setas;
 
 	//Imagem de fundo
 	var& SDL_Open_Image fundo = spawn SDL_Open_Image(&sdl!.ren, "media/img/fundo.png");

@@ -12,14 +12,13 @@ Este projeto é um jogo baseado no Dance Dance Revolution, e é escrito em CÉU 
 A parte gráfica e sonora será feita por meio de SDL, enquanto que um teclado de membrana será usado, no Arduino, para simular um tapete de dança.
 
 ## Componentes
-- 1 buzina
 - 1 teclado
 
 ## Divisão de tarefas
 
 ### LOAD
-1) Carregar arquivo que contém setas (tempo, tipo) - Anny
-2) Carregar mp3 (no sdl) - Anny
+1) Montar pool das setas que serão usadas na música - Anny
+2) Carregar música no SDL - Anny
 3) Carregar imagens - Leonardo
 
 ### RUN
@@ -29,8 +28,7 @@ A parte gráfica e sonora será feita por meio de SDL, enquanto que um teclado d
 4) Fazer verificação da "colisão" - Leonardo
 5) Tratar barra de vida - Anny
 	- clique sem colisão: perde vida
-	- clique com colisão: dependendo do nível de acerto, ganha vida.
-6) Tratar pontuação - Leonardo
+	- clique com colisão: ganha vida
 
 ### END
 1) Tratar fim de jogo - Anny

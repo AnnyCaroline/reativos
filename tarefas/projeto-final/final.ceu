@@ -55,7 +55,7 @@ code/await Seta (var int coluna, var int tempo, var& SDL_Open_Image seta) -> (va
 	else/if (coluna == 3) then
 		x = 400;
 	else 
-		500;
+		x = 500;
 	end
 
 	//considerando coluna=1

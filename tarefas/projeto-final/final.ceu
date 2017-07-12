@@ -1,0 +1,271 @@
+#include "sdl/sdl.ceu"
+
+#define LARGURA_JANELA 800
+#define ALTURA_JANELA 480
+#define BRANCO 0xFF,0xFF,0xFF,0xFF
+#define PRETO 0x00,0x00,0x00,0xFF
+
+native/pre do
+	##include <stdio.h>
+    ##include <unistd.h>
+    ##include <fcntl.h>
+end
+
+event void fundoRenderizado;
+input byte SERIAL;
+
+var int contBarra = 0;
+var int pontuacaoBarra = 8;
+var&? SDL_Init sdl = spawn SDL_Init("Dance Dance Revolution", LARGURA_JANELA, ALTURA_JANELA, SDL_Color(BRANCO));
+
+code/await ItemBarra (var int ar, var int ag, var int ab, var int aa) -> FOREVER do
+	outer.contBarra = outer.contBarra + 1;
+	var int indice = outer.contBarra;
+
+	var SDL_Rect ret = val SDL_Rect(311+10*outer.contBarra,34,7,21); //sempre insere na próxima posição
+
+	loop do
+		await outer.fundoRenderizado;
+		if (indice <= outer.pontuacaoBarra) then
+			//desenha com cor ativo
+			_SDL_SetRenderDrawColor(&&outer.sdl!.ren, ar, ag, ab, aa);
+		else 
+			//desenha com cor inativo
+			_SDL_SetRenderDrawColor(&&outer.sdl!.ren, 0, 0, 0, 0);
+		end	
+		_SDL_RenderFillRect(&&outer.sdl!.ren, (&&ret as _SDL_Rect&&));
+	end
+end
+
+code/await Seta (var int coluna, var int tempo, var& SDL_Open_Image seta) -> (var int tempoOut, event void comeca, event void termina) -> void do
+	tempoOut = tempo;
+
+	var float y = 480;
+	var int vy = 200;	
+
+	var int lastTime = 0;
+	var int currentTime = 0;
+	var int dt = 0;
+
+	var int x = 0;
+	if (coluna == 1) then
+		x = 200;
+	else/if (coluna == 2) then
+		x = 300;
+	else/if (coluna == 3) then
+		x = 400;
+	else 
+		x = 500;
+	end
+
+	//considerando coluna=1
+	var SDL_Rect seta_rct = val SDL_Rect(x, ALTURA_JANELA, 62, 62);
+
+	par/or do
+		loop do
+			await outer.fundoRenderizado;	
+			seta_rct.y = y as int;
+			_SDL_RenderCopy(&&outer.sdl!.ren, &&seta.tex.tex, null, &&seta_rct as _SDL_Rect&&);
+		end	
+	with
+		var int i;
+		loop i do
+			await termina;
+			y = 50;
+			break/i;
+		end
+	with
+		var int i;
+		loop i do
+			await comeca;
+			{printf("comecou\n");};
+
+			/* animação da seta */
+			every dt in SDL_DT do
+            	//await outer.fundoRenderizado;
+
+				// seta subindo
+                y = y - vy * dt/1000;
+				//{printf("dt: %d y: %d\n", @dt, @y);};
+				// se sair da tela, termina o loop -> termina o par/or -> termina a Seta
+                if y < 50 then
+					outer.pontuacaoBarra = outer.pontuacaoBarra - 1;
+					break/i;
+                end
+
+            end
+		end
+	with
+		var int teclaLida = 0;
+		loop do			
+			/* Lendo do Arduino (através do emit SERIAL do programa principal) */
+				
+			/*var byte teclaLida = await SERIAL;
+			if (y < 200 and teclaLida == tipo) then
+				call AtualizaEstatisticas(r.y);
+				_printf("%d\n", teclaLida);
+				break;
+			end*/
+
+			/* Lendo do teclado */	
+			await 50ms;
+			
+			if (y < 200) then
+				teclaLida = 0;	
+			end
+
+			par/or do
+				var _SDL_KeyboardEvent&& key;
+				key = await SDL_KEYDOWN until key:keysym.sym==_SDLK_LEFT;
+				teclaLida = 1;
+			with
+				var _SDL_KeyboardEvent&& key;
+				key = await SDL_KEYDOWN until key:keysym.sym==_SDLK_DOWN;
+				teclaLida = 2;
+			with
+				var _SDL_KeyboardEvent&& key;
+			    key = await SDL_KEYDOWN until key:keysym.sym==_SDLK_UP;
+				teclaLida = 3;
+			with
+				var _SDL_KeyboardEvent&& key;
+			    key = await SDL_KEYDOWN until key:keysym.sym==_SDLK_RIGHT;
+				teclaLida = 4;
+			end
+
+			if (teclaLida == coluna) then
+				//call AtualizaEstatisticas(r.y);
+				{printf("%d\n", @teclaLida);};
+
+				if (y < 100) then
+					outer.pontuacaoBarra = outer.pontuacaoBarra + 1;
+					break;
+				else //ToDo
+					outer.pontuacaoBarra = outer.pontuacaoBarra - 1;
+				end
+			end
+
+		end
+	end
+end
+
+watching sdl do
+
+	//Carrega setas
+	var& SDL_Open_Image seta1 = spawn SDL_Open_Image(&sdl!.ren, "media/img/seta1.png");
+	var& SDL_Open_Image seta2 = spawn SDL_Open_Image(&sdl!.ren, "media/img/seta2.png");	
+	var& SDL_Open_Image seta3 = spawn SDL_Open_Image(&sdl!.ren, "media/img/seta3.png");
+	var& SDL_Open_Image seta4 = spawn SDL_Open_Image(&sdl!.ren, "media/img/seta4.png");		
+
+	//Carrega info setas
+	pool[] Seta setas;
+	spawn Seta(2, 1000, &seta2) in setas;
+	spawn Seta(1, 500, &seta1) in setas;
+	spawn Seta(3, 5000, &seta3) in setas;
+	spawn Seta(4, 1000, &seta4) in setas;
+	spawn Seta(4, 500, &seta4) in setas;
+	spawn Seta(1, 1000, &seta1) in setas;
+
+	//Imagem de fundo
+	var& SDL_Open_Image fundo = spawn SDL_Open_Image(&sdl!.ren, "media/img/fundo.png");
+	var& SDL_Open_Image fundoPerdeu = spawn SDL_Open_Image(&sdl!.ren, "media/img/fundoPerdeu.png");
+	var& SDL_Open_Image fundoGanhou = spawn SDL_Open_Image(&sdl!.ren, "media/img/fundoGanhou.png");
+	var SDL_Rect fundo_rct = val SDL_Rect(0, 0, LARGURA_JANELA, ALTURA_JANELA);
+
+	//Barra
+	pool[16] ItemBarra barra;
+	spawn ItemBarra(170,  13, 60,  1) in barra;
+	spawn ItemBarra(170,  13, 60,  1) in barra;
+	spawn ItemBarra(170,  13, 60,  1) in barra;
+	spawn ItemBarra(163,  26, 129, 1) in barra;
+	spawn ItemBarra( 88,  76, 121, 1) in barra;
+	spawn ItemBarra(  9, 140, 132, 1) in barra;
+	spawn ItemBarra(  9, 140, 132, 1) in barra;
+	spawn ItemBarra( 14, 162, 106, 1) in barra;
+	spawn ItemBarra( 14, 162, 106, 1) in barra;
+	spawn ItemBarra(193, 193, 193, 1) in barra;
+	spawn ItemBarra(193, 193, 193, 1) in barra;
+	spawn ItemBarra(193, 193, 193, 1) in barra;
+	spawn ItemBarra(212, 135,  37, 1) in barra;
+	spawn ItemBarra(212, 135,  37, 1) in barra;
+	spawn ItemBarra(212, 135,  37, 1) in barra;
+	spawn ItemBarra(212, 135,  37, 1) in barra;
+
+
+	//Música
+	var& SDL_Open_Sound sound = spawn SDL_Open_Sound("media/audio/all.wav");
+	_Mix_PlayChannel(-1, &&sound.sound, 0);
+
+	par/or do
+		//Começa a contar o tempo das setas
+		var&? Seta s; 
+		loop s in setas do
+			//await s!.tempoOut;
+			var int i;
+			loop i in [1 -> s!.tempoOut] do
+				await 1 ms;
+			end
+
+			emit s!.comeca;
+			{printf("seta\n");};
+		end
+
+		await 2300ms;
+	with
+		every SDL_REDRAW do
+			_SDL_RenderCopy(&&sdl!.ren, &&fundo.tex.tex, null, &&fundo_rct as _SDL_Rect&&);
+			emit fundoRenderizado;
+		end
+	with
+		every 5ms do
+			if (pontuacaoBarra == 0) then
+				//limpa o pool
+				var&? Seta s; 
+				loop s in setas do
+					emit s!.termina;
+				end
+				//game over
+				break;
+			end
+		end
+    /*with
+			// Lê porta serial
+            var byte teclaLida = 20; // tecla inexistente, apenas para inicializar
+            var int h = 0;
+            var int it = 0;
+            await async (h, teclaLida) do
+				var int fd = _open("/dev/ttyACM0", _O_RDONLY);
+                var int flags = _fcntl(fd,_F_GETFL,0);
+				var int leu = _fcntl(fd, _F_SETFL, flags | _O_NONBLOCK);
+                if(leu != 0)  then 
+                    _printf("ERROR NO CONTROLLER\n");
+                else
+                    _printf("Joystick ON\n");
+                    loop do
+                        var int ret = _read(fd, &&teclaLida, 1);
+                        if ret > 0 and teclaLida > 0 then
+							// Tocar buzina
+							emit SERIAL(teclaLida);
+                        end
+                    end
+                end
+            end
+		*/
+	end
+
+	{printf("gameover");};
+
+    par/or do
+	   	every SDL_REDRAW do
+	   		if (pontuacaoBarra == 0) then
+	    		_SDL_RenderCopy(&&sdl!.ren, &&fundoPerdeu.tex.tex, null, &&fundo_rct as _SDL_Rect&&);
+	    	else
+	    		_SDL_RenderCopy(&&sdl!.ren, &&fundoGanhou.tex.tex, null, &&fundo_rct as _SDL_Rect&&);
+	    	end
+	    end
+    with
+    	await 3s;
+    end
+
+end
+
+escape 0;

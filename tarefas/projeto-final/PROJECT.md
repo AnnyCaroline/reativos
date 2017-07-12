@@ -35,3 +35,5 @@ A parte gráfica e sonora será feita por meio de SDL, enquanto que um teclado d
 ### END
 1) Tratar fim de jogo - Anny
 2) Tratar restart - Leonardo
+
+https://youtu.be/ZIs9ndqaqQY

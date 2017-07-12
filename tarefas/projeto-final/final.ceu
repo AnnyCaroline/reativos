@@ -55,7 +55,7 @@ code/await Seta (var int coluna, var int tempo, var& SDL_Open_Image seta) -> (va
 	else/if (coluna == 3) then
 		x = 400;
 	else 
-		x = 500;
+		500;
 	end
 
 	//considerando coluna=1
@@ -159,7 +159,7 @@ watching sdl do
 	//Carrega info setas
 	pool[] Seta setas;
 	spawn Seta(2, 1000, &seta2) in setas;
-	spawn Seta(1, 500, &seta1) in setas;
+	spawn Seta(1, 2000, &seta1) in setas;
 
 	//Imagem de fundo
 	var& SDL_Open_Image fundo = spawn SDL_Open_Image(&sdl!.ren, "media/img/fundo.png");

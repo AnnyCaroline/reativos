@@ -3,7 +3,6 @@
 #define LARGURA_JANELA 800
 #define ALTURA_JANELA 480
 #define BRANCO 0xFF,0xFF,0xFF,0xFF
-#define PRETO 0x00,0x00,0x00,0xFF
 
 native/pre do
 	##include <stdio.h>
@@ -61,7 +60,6 @@ code/await Seta (var int coluna, var int tempo, var& SDL_Open_Image seta) -> (va
 		x = 510;
 	end
 
-	//considerando coluna=1
 	var SDL_Rect seta_rct = val SDL_Rect(x, ALTURA_JANELA, 62, 62);
 
 	par/or do
@@ -81,15 +79,12 @@ code/await Seta (var int coluna, var int tempo, var& SDL_Open_Image seta) -> (va
 		var int i;
 		loop i do
 			await comeca;
-			{printf("comecou\n");};
 
 			/* animação da seta */
 			every dt in SDL_DT do
-            	//await outer.fundoRenderizado;
-
 				// seta subindo
                 y = y - vy * dt/1000;
-				//{printf("dt: %d y: %d\n", @dt, @y);};
+
 				// se sair da tela, termina o loop -> termina o par/or -> termina a Seta
                 if y < 50 then
                 	if (outer.pontuacaoBarra > 0) then
@@ -104,22 +99,12 @@ code/await Seta (var int coluna, var int tempo, var& SDL_Open_Image seta) -> (va
 	with
 		var int teclaLida = 0;
 		loop do			
-			/* Lendo do Arduino (através do emit SERIAL do programa principal) */
-				
-			/*var byte teclaLida = await SERIAL;
-			if (y < 200 and teclaLida == tipo) then
-				call AtualizaEstatisticas(r.y);
-				_printf("%d\n", teclaLida);
-				break;
-			end*/
+			// Lendo do Arduino (através do emit SERIAL do programa principal)
+			// var byte teclaLida = await SERIAL;
 
-			/* Lendo do teclado */	
+			// Lendo do teclado
 			await 50ms;
-			
-			if (y < 200) then
-				teclaLida = 0;	
-			end
-
+		
 			par/or do
 				var _SDL_KeyboardEvent&& key;
 				key = await SDL_KEYDOWN until key:keysym.sym==_SDLK_LEFT;
@@ -139,7 +124,6 @@ code/await Seta (var int coluna, var int tempo, var& SDL_Open_Image seta) -> (va
 			end
 
 			if (teclaLida == coluna) then
-				//call AtualizaEstatisticas(r.y);
 				{printf("%d\n", @teclaLida);};
 
 				if (y < 120) then
@@ -261,33 +245,31 @@ watching sdl do
 					break;
 				end
 			end
-	    /*with
-				// Lê porta serial
-	            var byte teclaLida = 20; // tecla inexistente, apenas para inicializar
-	            var int h = 0;
-	            var int it = 0;
-	            await async (h, teclaLida) do
-					var int fd = _open("/dev/ttyACM0", _O_RDONLY);
-	                var int flags = _fcntl(fd,_F_GETFL,0);
-					var int leu = _fcntl(fd, _F_SETFL, flags | _O_NONBLOCK);
-	                if(leu != 0)  then 
-	                    _printf("ERROR NO CONTROLLER\n");
-	                else
-	                    _printf("Joystick ON\n");
-	                    loop do
-	                        var int ret = _read(fd, &&teclaLida, 1);
-	                        if ret > 0 and teclaLida > 0 then
-								emit SERIAL(teclaLida);
-	                        end
-	                    end
-	                end
-	            end
-			*/
+		// with
+		// 		// Lê porta serial
+		// 		var byte teclaLida = 20; // tecla inexistente, apenas para inicializar
+		// 		var int h = 0;
+		// 		var int it = 0;
+		// 		await async (h, teclaLida) do
+		// 			var int fd = _open("/dev/ttyACM0", _O_RDONLY);
+		// 			var int flags = _fcntl(fd,_F_GETFL,0);
+		// 			var int leu = _fcntl(fd, _F_SETFL, flags | _O_NONBLOCK);
+		// 			if(leu != 0)  then 
+		// 				_printf("ERROR NO CONTROLLER\n");
+		// 			else
+		// 				_printf("Joystick ON\n");
+		// 				loop do
+		// 					var int ret = _read(fd, &&teclaLida, 1);
+		// 					if ret > 0 and teclaLida > 0 then
+		// 						emit SERIAL(teclaLida);
+		// 					end
+		// 				end
+		// 			end
+		// 		end
+			
 		end
 
 		{printf("gameover");};
-		pontuacaoBarra = 8;
-		_Mix_HaltChannel(-1); //para música
 
 	    par/or do
 		   	every SDL_REDRAW do
@@ -299,6 +281,8 @@ watching sdl do
 		    end
 	    with
 	    	await 3s;
+	    	pontuacaoBarra = 8;
+			_Mix_HaltChannel(-1); //para música
 	    end
 
     end

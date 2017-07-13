@@ -7,12 +7,19 @@
 
 Este projeto é um jogo baseado no Dance Dance Revolution, e é escrito em CÉU utilizando SDL e Arduino.
 
-![Dance Dance Revolution ps1](https://68.media.tumblr.com/aa72eb1c81b9209a6406f93df343960f/tumblr_ndg16wIDv71qd4q8ao1_500.gif)
+![Dance Dance Revolution ps1](https://68.media.tumblr.com/aa72eb1c81b9209a6406f93df343960f/tumblr_ndg16wIDv71qd4q8ao1_500.gif)  
+Gif do jogo no qual nos baseamos  
 
-A parte gráfica e sonora será feita por meio de SDL, enquanto que um teclado de membrana será usado, no Arduino, para simular um tapete de dança.
+A parte gráfica e sonora será feita por meio de SDL, enquanto que um teclado de membrana será usado, no Arduino, para simular um tapete de dança.  
+
+![Imagem do nosso jogo](DANCE.PNG)  
+Imagem do nosso jogo
 
 ## Componentes
 - 1 teclado
+
+## Circuito
+![Circuito](CIRCUITO.PNG)
 
 ## Vídeos
 [Playlist com os vídeos do projeto](https://www.youtube.com/playlist?list=PL-Vy8N4zUqm6epgmOByDoAEiEwYhebnui)  

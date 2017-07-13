@@ -14,6 +14,14 @@ A parte gráfica e sonora será feita por meio de SDL, enquanto que um teclado d
 ## Componentes
 - 1 teclado
 
+## Vídeos
+[Playlist com os vídeos do projeto](https://www.youtube.com/playlist?list=PL-Vy8N4zUqm6epgmOByDoAEiEwYhebnui)  
+Os dois primeiros vídeos da playlist são referentes ao [commit 9f6916c](https://github.com/AnnyCaroline/reativos/tree/9f6916ce00c916083de58372b11d49af671aa9ec/tarefas/projeto-final), o qual ainda apresentava poucas teclas e tinha um pequeno bug. Já o terceiro vídeo corresponde à segunda versão (obs: o programa que executa no arduino não sofreu alteração de uma versão para a outra).  
+
+### Explicação sobre o bug da versão 1
+A primeira versão retirava um ponto/vida a cada tecla pressionada no tempo errado.  
+Porém, como isso estava gerando um bug, a versão 2 não decrementa a pontuação/vida no caso de pressionamento incorreto.
+
 ## Divisão de tarefas
 
 ### LOAD
@@ -33,5 +41,3 @@ A parte gráfica e sonora será feita por meio de SDL, enquanto que um teclado d
 ### END
 1) Tratar fim de jogo - Anny
 2) Tratar restart - Leonardo
-
-https://youtu.be/ZIs9ndqaqQY
